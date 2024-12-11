@@ -1,14 +1,30 @@
 server: 
   port : 8082
-database: 
-  - user: admin 
-    password: admin
-    host: localhost
-    dbName: shopDEV
-  - user: user 
-    password: user
-    host: localhost
-    dbName: orderUser
-security: 
-  jwt: 
-    key: abc123
+  mode: "dev"
+mysql: 
+  host: 127.0.0.1
+  port: 3306
+  username: root
+  password: password
+  dbname: shopdev
+  maxIdleConns: 10
+  maxOpenConns: 100
+  connMaxLifetime: 3600
+postgres:
+  dbDriver: postgres
+  dbSource: "postgresql://root:secret@localhost:5432/goBackend?sslmode=disable"
+logger: 
+  log_level: debug
+  file_log_name: "./storages/logs/dev.001.log"
+  max_size: 500
+  max_backups: 3
+  max_age: 28
+  compress: true
+redis: 
+  host: localhost
+  port: 6379
+  password: U9vO5nr7tG3ECgoAy871PXL5I53oD9tE
+token: 
+  secret_key: "01234567890123456789012345678912"
+  access_token_duration: 15m
+  refresh_token_duration: 24h

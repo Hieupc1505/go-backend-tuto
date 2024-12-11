@@ -1,0 +1,36 @@
+@baseUrl=http://localhost:8002/v1/2024/user
+
+###
+POST {{baseUrl}}/register
+Content-Type: application/json
+
+{
+    "email": "hoanghieuss3x1@gmail.com",
+    "password": "test13435"
+}
+
+###
+POST {{baseUrl}}/verify_otp
+Content-Length: application/json
+
+{
+    "email": "hoanghieuss3x1@gmail.com", 
+    "otp": 123456
+}
+
+###
+POST {{baseUrl}}/login
+Content-Length: application/json
+
+{
+    "email": "hoanghieuss3x1@gmail.com", 
+    "password": "test13435"
+}
+###
+POST {{baseUrl}}/info
+Content-Length: application/json
+
+{
+    "email": "hoanghieuss3x1@gmail.com", 
+    "password": "test13435"
+}

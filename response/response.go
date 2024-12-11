@@ -1,10 +1,30 @@
 package response
 
-import "github.com/gin-gonic/gin"
+type Response struct {
+	Code    int         `json:"code,omitempty"`
+	Message string      `json:"message"`
+	Errors  interface{} `json:"errors,omitempty"`
+	Data    interface{} `json:"data,omitempty"`
+}
 
-func ErrorResponse(ctx *gin.Context, code int, mess string) {
-	ctx.JSON(200, gin.H{
-		"code": code,
-		"msg":  msg[code],
-	})
+type EmptyObj struct{}
+
+func SuccessResponse(code int, message string, data interface{}) Response {
+	res := Response{
+		Message: message,
+		Data:    data,
+		Code:    0,
+		Errors:  nil,
+	}
+	return res
+}
+
+func ErrorResponse(code int, message string, err string) Response {
+	res := Response{
+		Code:    code,
+		Message: msg[code],
+		Errors:  err,
+		Data:    nil,
+	}
+	return res
 }
