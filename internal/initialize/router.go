@@ -24,6 +24,7 @@ func InitRouter() *gin.Engine {
 
 	manageRoute := routers.RouterGroupApp.Manager
 	userRoute := routers.RouterGroupApp.User
+	uploadRoute := routers.RouterGroupApp.Upload
 
 	MainGroup := r.Group("/v1/2024")
 	{
@@ -36,6 +37,9 @@ func InitRouter() *gin.Engine {
 	{
 		manageRoute.InitAdminRouter(MainGroup)
 		manageRoute.InitUserManagerRouter(MainGroup)
+	}
+	{
+		uploadRoute.InitUploadImageRouter(MainGroup)
 	}
 
 	return r

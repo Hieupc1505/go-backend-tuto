@@ -9,6 +9,8 @@ type Config struct {
 	Redis  RedisSetting    `mapstructure:"redis"`
 	PgDb   PostgresSetting `mapstructure:"postgres"`
 	Token  TokenSetting    `mapstructure:"token"`
+	Imgur  ImgurSetting    `mapstructure:"imgur"`
+	Imgbb  ImgbbSetting    `mapstructure:"imgbb"`
 }
 
 type ServerSetting struct {
@@ -51,4 +53,13 @@ type TokenSetting struct {
 	SecretKey            string        `mapstructure:"secret_key"`
 	AccessTokenDuration  time.Duration `mapstructure:"access_token_duration"`
 	RefreshTokenDuration time.Duration `mapstructure:"refresh_token_duration"`
+}
+
+type ImgurSetting struct {
+	ClientID     string `mapstructure:"client_id"`
+	ClientSecret string `mapstructure:"client_secret"`
+}
+
+type ImgbbSetting struct {
+	ApiKey string `mapstructure:"api_key"`
 }

@@ -11,7 +11,16 @@ import (
 	"hieupc05.github/backend-server/internal/repo"
 	"hieupc05.github/backend-server/internal/services"
 	"hieupc05.github/backend-server/internal/utils/token"
+	"hieupc05.github/backend-server/pkg/uploadImage"
 )
+
+// Injectors from upload.wire.go:
+
+func InitUploadRouterHandler(secretKey string) (*controllers.UploadController, error) {
+	iUploadImage := uploadimage.NewImgbbUpload(secretKey)
+	uploadController := controllers.NewUploadController(iUploadImage)
+	return uploadController, nil
+}
 
 // Injectors from user.wire.go:
 

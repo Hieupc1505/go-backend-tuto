@@ -28,3 +28,8 @@ token:
   secret_key: "01234567890123456789012345678912"
   access_token_duration: 15m
   refresh_token_duration: 24h
+imgur: 
+  client_id: c73e3a75440ef9f
+  client_secret: 29b45fc20eb0a236885c9c0f50db5a6e309cd519
+imgbb:
+  api_key: f2335b3f22806aa403a63b411d7fc6cd
