@@ -9,17 +9,20 @@ import (
 )
 
 type SseController struct {
-	connections map[chan string]struct{}
-	lock        sync.Mutex
+	rooms map[string]map[chan string]struct{}
+	lock  sync.Mutex
 }
 
 func NewSseController() *SseController {
 	return &SseController{
-		connections: make(map[chan string]struct{}),
+		rooms: make(map[string]map[chan string]struct{}),
 	}
 }
 
 func (s *SseController) SseConnection(c *gin.Context) {
+
+	room := c.DefaultQuery("room", "default")
+
 	c.Writer.Header().Set("Content-Type", "text/event-stream")
 	c.Writer.Header().Set("Cache-Control", "no-cache")
 	c.Writer.Header().Set("Connection", "keep-alive")
@@ -29,17 +32,20 @@ func (s *SseController) SseConnection(c *gin.Context) {
 	clientChan := make(chan string)
 
 	s.lock.Lock()
-	s.connections[clientChan] = struct{}{}
-	fmt.Println("New connection added. Total connections:", len(s.connections))
+	if _, ok := s.rooms[room]; !ok {
+		s.rooms[room] = make(map[chan string]struct{})
+	}
+	s.rooms[room][clientChan] = struct{}{}
 	s.lock.Unlock()
 
 	defer func() {
 		s.lock.Lock()
-		delete(s.connections, clientChan)
+		delete(s.rooms[room], clientChan)
 		s.lock.Unlock()
 		close(clientChan)
 	}()
 
+	// Gửi dữ liệu cho client
 	for {
 		select {
 		case message := <-clientChan:
@@ -48,15 +54,16 @@ func (s *SseController) SseConnection(c *gin.Context) {
 				return
 			}
 		case <-c.Request.Context().Done():
-			fmt.Println("Client disconnected", len(s.connections))
+			fmt.Println("Client disconnected")
 			return
 		}
 	}
 }
 
 func (s *SseController) SseStartContest(c *gin.Context) {
+
+	room := c.DefaultQuery("room", "default") // Lấy phòng từ query parameter
 	message := "Start Contest"
-	fmt.Println(message, len(s.connections))
 
 	// s.lock.Lock()
 	// for clientChan := range s.connections {
@@ -64,7 +71,7 @@ func (s *SseController) SseStartContest(c *gin.Context) {
 	// }
 	// s.lock.Unlock()
 	s.lock.Lock()
-	for clientChan := range s.connections {
+	for clientChan := range s.rooms[room] {
 		go func(ch chan string) {
 			select {
 			case ch <- message:
@@ -80,7 +87,7 @@ func (s *SseController) SseStartContest(c *gin.Context) {
 
 func (s *SseController) SseEndContest(c *gin.Context) {
 	message := "End Contest"
-	fmt.Println(message, len(s.connections))
+	fmt.Println(message, len(s.rooms))
 }
 
 func (s *SseController) CreateContest(c *gin.Context) {
