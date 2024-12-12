@@ -1,3 +1,5 @@
 docs
 
+storages/logs/*.log
+
 test/api/storages/logs/*.log

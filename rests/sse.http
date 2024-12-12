@@ -1,0 +1,3 @@
+@baseUrl=http://localhost:8002/v1/2024/sse
+###
+GET {{baseUrl}}/contest/start
