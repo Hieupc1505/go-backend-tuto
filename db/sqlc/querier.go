@@ -12,10 +12,14 @@ import (
 
 type Querier interface {
 	ChangePassword(ctx context.Context, arg ChangePasswordParams) (User, error)
+	CreateContest(ctx context.Context, arg CreateContestParams) (int64, error)
 	CreateSession(ctx context.Context, arg CreateSessionParams) (Session, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
+	GetContest(ctx context.Context, id int64) (GetContestRow, error)
+	GetContestByState(ctx context.Context, state ContestState) ([]GetContestByStateRow, error)
 	GetSession(ctx context.Context, id uuid.UUID) (Session, error)
 	GetUserByEmail(ctx context.Context, email string) (User, error)
+	UpdateContest(ctx context.Context, arg UpdateContestParams) (UpdateContestRow, error)
 }
 
 var _ Querier = (*Queries)(nil)

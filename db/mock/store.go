@@ -51,6 +51,21 @@ func (mr *MockStoreMockRecorder) ChangePassword(arg0, arg1 interface{}) *gomock.
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ChangePassword", reflect.TypeOf((*MockStore)(nil).ChangePassword), arg0, arg1)
 }
 
+// CreateContest mocks base method.
+func (m *MockStore) CreateContest(arg0 context.Context, arg1 db.CreateContestParams) (int64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateContest", arg0, arg1)
+	ret0, _ := ret[0].(int64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateContest indicates an expected call of CreateContest.
+func (mr *MockStoreMockRecorder) CreateContest(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateContest", reflect.TypeOf((*MockStore)(nil).CreateContest), arg0, arg1)
+}
+
 // CreateSession mocks base method.
 func (m *MockStore) CreateSession(arg0 context.Context, arg1 db.CreateSessionParams) (db.Session, error) {
 	m.ctrl.T.Helper()
@@ -81,6 +96,36 @@ func (mr *MockStoreMockRecorder) CreateUser(arg0, arg1 interface{}) *gomock.Call
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUser", reflect.TypeOf((*MockStore)(nil).CreateUser), arg0, arg1)
 }
 
+// GetContest mocks base method.
+func (m *MockStore) GetContest(arg0 context.Context, arg1 int64) (db.GetContestRow, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetContest", arg0, arg1)
+	ret0, _ := ret[0].(db.GetContestRow)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetContest indicates an expected call of GetContest.
+func (mr *MockStoreMockRecorder) GetContest(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetContest", reflect.TypeOf((*MockStore)(nil).GetContest), arg0, arg1)
+}
+
+// GetContestByState mocks base method.
+func (m *MockStore) GetContestByState(arg0 context.Context, arg1 db.ContestState) ([]db.GetContestByStateRow, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetContestByState", arg0, arg1)
+	ret0, _ := ret[0].([]db.GetContestByStateRow)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetContestByState indicates an expected call of GetContestByState.
+func (mr *MockStoreMockRecorder) GetContestByState(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetContestByState", reflect.TypeOf((*MockStore)(nil).GetContestByState), arg0, arg1)
+}
+
 // GetSession mocks base method.
 func (m *MockStore) GetSession(arg0 context.Context, arg1 uuid.UUID) (db.Session, error) {
 	m.ctrl.T.Helper()
@@ -109,4 +154,19 @@ func (m *MockStore) GetUserByEmail(arg0 context.Context, arg1 string) (db.User, 
 func (mr *MockStoreMockRecorder) GetUserByEmail(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserByEmail", reflect.TypeOf((*MockStore)(nil).GetUserByEmail), arg0, arg1)
+}
+
+// UpdateContest mocks base method.
+func (m *MockStore) UpdateContest(arg0 context.Context, arg1 db.UpdateContestParams) (db.UpdateContestRow, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateContest", arg0, arg1)
+	ret0, _ := ret[0].(db.UpdateContestRow)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateContest indicates an expected call of UpdateContest.
+func (mr *MockStoreMockRecorder) UpdateContest(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateContest", reflect.TypeOf((*MockStore)(nil).UpdateContest), arg0, arg1)
 }

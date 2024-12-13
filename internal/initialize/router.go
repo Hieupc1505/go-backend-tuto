@@ -26,6 +26,7 @@ func InitRouter() *gin.Engine {
 	userRoute := routers.RouterGroupApp.User
 	uploadRoute := routers.RouterGroupApp.Upload
 	sseRoute := routers.RouterGroupApp.Sse
+	contestRoute := routers.RouterGroupApp.Contest
 
 	MainGroup := r.Group("/v1/2024")
 	{
@@ -44,6 +45,9 @@ func InitRouter() *gin.Engine {
 	}
 	{
 		sseRoute.InitSseRouter(MainGroup)
+	}
+	{
+		contestRoute.InitContestRouter(MainGroup)
 	}
 
 	return r

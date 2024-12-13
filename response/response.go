@@ -1,30 +1,31 @@
 package response
 
 type Response struct {
-	Code    int         `json:"code,omitempty"`
-	Message string      `json:"message"`
-	Errors  interface{} `json:"errors,omitempty"`
-	Data    interface{} `json:"data,omitempty"`
+	Errors interface{} `json:"e"`
+	Data   interface{} `json:"d,omitempty"`
+}
+
+type MsgResponse struct {
+	Msg string `json:"msg"`
 }
 
 type EmptyObj struct{}
 
-func SuccessResponse(code int, message string, data interface{}) Response {
+func SuccessResponse(code int, data interface{}) Response {
 	res := Response{
-		Message: message,
-		Data:    data,
-		Code:    0,
-		Errors:  nil,
+		Data:   data,
+		Errors: 0,
 	}
 	return res
 }
 
-func ErrorResponse(code int, message string, err string) Response {
+func ErrorResponse(code int) Response {
+	msg := ErrorMessages[code]
 	res := Response{
-		Code:    code,
-		Message: msg[code],
-		Errors:  err,
-		Data:    nil,
+		Errors: msg.Code,
+		Data: MsgResponse{
+			Msg: msg.Message,
+		},
 	}
 	return res
 }

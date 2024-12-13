@@ -73,7 +73,7 @@ type loginUserResponse struct {
 func (us *userServices) Register(email string, password string) (_ response.Response, httpStatus int) {
 	// 1. Check email exist
 	if _, err := us.userRepo.GetUserByEmail(email); err == nil {
-		return response.ErrorResponse(response.ErrCodeUserHasExists, "", ""), http.StatusConflict
+		return response.ErrorResponse(response.ErrAuthFail), http.StatusConflict
 	}
 	fmt.Println("get user by email + 1")
 	// 2. new OTP
@@ -84,7 +84,7 @@ func (us *userServices) Register(email string, password string) (_ response.Resp
 
 	hasPass, err := passExt.HashPassword(password)
 	if err != nil {
-		return response.ErrorResponse(response.ErrInvalidOTP, "", ""), http.StatusInternalServerError
+		return response.ErrorResponse(response.ErrSystem), http.StatusInternalServerError
 	}
 
 	data, err := json.Marshal(RegisterDataHash{
@@ -92,7 +92,7 @@ func (us *userServices) Register(email string, password string) (_ response.Resp
 		Password: hasPass,
 	})
 	if err != nil {
-		return response.ErrorResponse(response.ErrInvalidOTP, "", ""), http.StatusInternalServerError
+		return response.ErrorResponse(response.ErrInvalidData), http.StatusInternalServerError
 	}
 
 	hashEmail := ucrypto.GetHash(email)
@@ -100,7 +100,7 @@ func (us *userServices) Register(email string, password string) (_ response.Resp
 	// 3. Save OTP in Redis with expiration time
 	err = us.userAuthRepo.OTPMaker(hashEmail, data, int64(10*time.Minute))
 	if err != nil {
-		return response.ErrorResponse(response.ErrInvalidOTP, "", ""), http.StatusInternalServerError
+		return response.ErrorResponse(response.ErrSystem), http.StatusInternalServerError
 	}
 
 	// 4. Send Email OTP to user
@@ -109,11 +109,11 @@ func (us *userServices) Register(email string, password string) (_ response.Resp
 	})
 
 	if err != nil {
-		return response.ErrorResponse(response.ErrSendMailOtp, "", ""), http.StatusInternalServerError
+		return response.ErrorResponse(response.ErrSystem), http.StatusInternalServerError
 	}
 
 	// Success
-	return response.SuccessResponse(response.ErrCodeSuccess, "", nil), http.StatusOK
+	return response.SuccessResponse(response.ErrCodeSuccess, nil), http.StatusOK
 }
 
 func (us *userServices) CreateUser(ctx *gin.Context, otp int, email string) (_ response.Response, httpStatus int) {
@@ -125,20 +125,20 @@ func (us *userServices) CreateUser(ctx *gin.Context, otp int, email string) (_ r
 	otpRedis, err := global.Rdb.Get(ctx, fmt.Sprintf("usr:%s:otp", hashMail)).Result()
 	if err != nil {
 		if errors.Is(err, redis.Nil) {
-			return response.ErrorResponse(response.ErrInvalidOTP, "OTP not found or expired", ""), http.StatusBadRequest
+			return response.ErrorResponse(response.ErrSystem), http.StatusBadRequest
 		}
-		return response.ErrorResponse(response.ErrInternalServerlError, "Failed to fetch OTP from Redis", ""), http.StatusInternalServerError
+		return response.ErrorResponse(response.ErrSystem), http.StatusInternalServerError
 	}
 
 	// Parse the OTP data
 	if err := json.Unmarshal([]byte(otpRedis), &otpData); err != nil {
-		return response.ErrorResponse(response.ErrInvalidOTP, "Invalid OTP data", ""), http.StatusBadRequest
+		return response.ErrorResponse(response.ErrInvalidData), http.StatusBadRequest
 	}
 
 	// Convert OTP from Redis and validate
 	otpCnv, err := strconv.Atoi(otpData.OTP)
 	if err != nil || otp != otpCnv {
-		return response.ErrorResponse(response.ErrInvalidOTP, "OTP mismatch", ""), http.StatusBadRequest
+		return response.ErrorResponse(response.ErrInvalidData), http.StatusBadRequest
 	}
 
 	// 2. Save user to the database
@@ -146,16 +146,16 @@ func (us *userServices) CreateUser(ctx *gin.Context, otp int, email string) (_ r
 		Email:          email,
 		HashedPassword: otpData.Password,
 	}); err != nil {
-		return response.ErrorResponse(response.ErrInternalServerlError, "Failed to create user", ""), http.StatusInternalServerError
+		return response.ErrorResponse(response.ErrSystem), http.StatusInternalServerError
 	}
 
 	// 3. Delete OTP from Redis
 	if err := global.Rdb.Del(ctx, fmt.Sprintf("usr:%s:otp", hashMail)).Err(); err != nil {
-		return response.ErrorResponse(response.ErrInternalServerlError, "Failed to clean up OTP", ""), http.StatusInternalServerError
+		return response.ErrorResponse(response.ErrSystem), http.StatusInternalServerError
 	}
 
 	// 4. Return success response
-	return response.SuccessResponse(response.ErrCodeSuccess, "User created successfully", nil), http.StatusOK
+	return response.SuccessResponse(response.ErrCodeSuccess, nil), http.StatusOK
 }
 
 func (us *userServices) Login(ctx *gin.Context, email string, purpose string) (_ response.Response, httpStatus int) {
@@ -163,24 +163,24 @@ func (us *userServices) Login(ctx *gin.Context, email string, purpose string) (_
 	user, err := us.userRepo.GetUserByEmail(email)
 	if err != nil {
 		if err == db.ErrRecordNotFound {
-			return response.ErrorResponse(response.ErrStatusNotFound, "", ""), http.StatusBadRequest
+			return response.ErrorResponse(response.ErrUserNotFound), http.StatusBadRequest
 		}
-		return response.ErrorResponse(response.ErrInternalServerlError, "", ""), http.StatusInternalServerError
+		return response.ErrorResponse(response.ErrSystem), http.StatusInternalServerError
 	}
 
 	err = password.CheckPassword(purpose, user.HashedPassword)
 	if err != nil {
-		return response.ErrorResponse(response.ErrStatusUnauthorized, "", ""), http.StatusUnauthorized
+		return response.ErrorResponse(response.ErrAuthFail), http.StatusUnauthorized
 	}
 
-	accessToken, accessPayload, err := us.tokenMaker.CreateToken(user.Email, user.Role, global.Config.Token.AccessTokenDuration)
+	accessToken, accessPayload, err := us.tokenMaker.CreateToken(user.ID, user.Role, global.Config.Token.AccessTokenDuration)
 	if err != nil {
-		return response.ErrorResponse(response.ErrLoginFail, "", err.Error()), http.StatusInternalServerError
+		return response.ErrorResponse(response.ErrSystem), http.StatusInternalServerError
 	}
 
-	refreshToken, refreshPayload, err := us.tokenMaker.CreateToken(user.Email, user.Role, global.Config.Token.RefreshTokenDuration)
+	refreshToken, refreshPayload, err := us.tokenMaker.CreateToken(user.ID, user.Role, global.Config.Token.RefreshTokenDuration)
 	if err != nil {
-		return response.ErrorResponse(response.ErrLoginFail, "", err.Error()), http.StatusInternalServerError
+		return response.ErrorResponse(response.ErrSystem), http.StatusInternalServerError
 	}
 
 	session, err := global.PgDb.CreateSession(ctx, db.CreateSessionParams{
@@ -193,7 +193,7 @@ func (us *userServices) Login(ctx *gin.Context, email string, purpose string) (_
 		ExpiresAt:    refreshPayload.ExpiredAt,
 	})
 	if err != nil {
-		return response.ErrorResponse(response.ErrLoginFail, "", err.Error()), http.StatusInternalServerError
+		return response.ErrorResponse(response.ErrSystem), http.StatusInternalServerError
 	}
 
 	rsp := loginUserResponse{
@@ -205,7 +205,7 @@ func (us *userServices) Login(ctx *gin.Context, email string, purpose string) (_
 		User:                  user,
 	}
 
-	return response.SuccessResponse(response.ErrCodeSuccess, "", rsp), http.StatusOK
+	return response.SuccessResponse(response.ErrCodeSuccess, rsp), http.StatusOK
 }
 
 func NewUserServices(userRepo repos.IUserRepository, userAuthRepo repos.IUserAuthRepository, tokenMaker token.Maker) IUserServices {

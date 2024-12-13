@@ -13,7 +13,7 @@ const changePassword = `-- name: ChangePassword :one
 UPDATE users
 SET hashed_password = $2
 WHERE email = $1
-RETURNING hashed_password, email, password_changed_at, created_at, role
+RETURNING id, hashed_password, email, password_changed_at, created_at, role
 `
 
 type ChangePasswordParams struct {
@@ -25,6 +25,7 @@ func (q *Queries) ChangePassword(ctx context.Context, arg ChangePasswordParams) 
 	row := q.db.QueryRow(ctx, changePassword, arg.Email, arg.HashedPassword)
 	var i User
 	err := row.Scan(
+		&i.ID,
 		&i.HashedPassword,
 		&i.Email,
 		&i.PasswordChangedAt,
@@ -40,7 +41,7 @@ INSERT INTO users (
     hashed_password
 ) VALUES (
     $1, $2
-) RETURNING hashed_password, email, password_changed_at, created_at, role
+) RETURNING id, hashed_password, email, password_changed_at, created_at, role
 `
 
 type CreateUserParams struct {
@@ -52,6 +53,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 	row := q.db.QueryRow(ctx, createUser, arg.Email, arg.HashedPassword)
 	var i User
 	err := row.Scan(
+		&i.ID,
 		&i.HashedPassword,
 		&i.Email,
 		&i.PasswordChangedAt,
@@ -62,7 +64,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT hashed_password, email, password_changed_at, created_at, role FROM users
+SELECT id, hashed_password, email, password_changed_at, created_at, role FROM users
 WHERE email = $1
 LIMIT 1
 `
@@ -71,6 +73,7 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 	row := q.db.QueryRow(ctx, getUserByEmail, email)
 	var i User
 	err := row.Scan(
+		&i.ID,
 		&i.HashedPassword,
 		&i.Email,
 		&i.PasswordChangedAt,

@@ -5,10 +5,55 @@
 package db
 
 import (
+	"database/sql/driver"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
 )
+
+type ContestState string
+
+const (
+	ContestStateIDLE     ContestState = "IDLE"
+	ContestStateRUNNING  ContestState = "RUNNING"
+	ContestStateFINISHED ContestState = "FINISHED"
+)
+
+func (e *ContestState) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = ContestState(s)
+	case string:
+		*e = ContestState(s)
+	default:
+		return fmt.Errorf("unsupported scan type for ContestState: %T", src)
+	}
+	return nil
+}
+
+type NullContestState struct {
+	ContestState ContestState `json:"contest_state"`
+	Valid        bool         `json:"valid"` // Valid is true if ContestState is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullContestState) Scan(value interface{}) error {
+	if value == nil {
+		ns.ContestState, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.ContestState.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullContestState) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.ContestState), nil
+}
 
 type Session struct {
 	ID           uuid.UUID `json:"id"`
@@ -21,7 +66,21 @@ type Session struct {
 	CreatedAt    time.Time `json:"created_at"`
 }
 
+type SfContest struct {
+	ID            int64        `json:"id"`
+	UserID        int64        `json:"user_id"`
+	SubjectID     int64        `json:"subject_id"`
+	NumQuestion   int32        `json:"num_question"`
+	TimeExam      int32        `json:"time_exam"`
+	TimeStartExam int64        `json:"time_start_exam"`
+	State         ContestState `json:"state"`
+	Questions     string       `json:"questions"`
+	CreatedTime   time.Time    `json:"created_time"`
+	UpdatedTime   time.Time    `json:"updated_time"`
+}
+
 type User struct {
+	ID                int64     `json:"id"`
 	HashedPassword    string    `json:"hashed_password"`
 	Email             string    `json:"email"`
 	PasswordChangedAt time.Time `json:"password_changed_at"`

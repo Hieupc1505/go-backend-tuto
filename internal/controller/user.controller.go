@@ -40,7 +40,7 @@ func (uc *UserController) Register(c *gin.Context) {
 	var req RegisterForm
 	if err := c.ShouldBindJSON(&req); err != nil {
 		global.Logger.Error(err.Error(), zap.Error(err))
-		res := response.ErrorResponse(response.ErrCodeParamInvalid, "", err.Error())
+		res := response.ErrorResponse(response.ErrAuthFail)
 		c.JSON(http.StatusBadRequest, res)
 		return
 	}
@@ -58,7 +58,7 @@ func (uc *UserController) CreateUser(c *gin.Context) {
 	if err := c.ShouldBindJSON(&req); err != nil {
 		fmt.Println("error body")
 		global.Logger.Error(err.Error(), zap.Error(err))
-		res := response.ErrorResponse(response.ErrCodeParamInvalid, "", err.Error())
+		res := response.ErrorResponse(response.ErrAuthFail)
 		c.JSON(http.StatusBadRequest, res)
 		return
 	}
@@ -74,7 +74,7 @@ func (uc *UserController) Login(c *gin.Context) {
 	var req loginUserRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		global.Logger.Error(err.Error(), zap.Error(err))
-		res := response.ErrorResponse(response.ErrCodeParamInvalid, "", err.Error())
+		res := response.ErrorResponse(response.ErrAuthFail)
 		c.JSON(http.StatusBadRequest, res)
 		return
 	}

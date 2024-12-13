@@ -1,0 +1,12 @@
+@baseURL=http://localhost:8002/v1/2024/contest
+
+###
+POST {{baseURL}}/create
+Authorization: Bearer v2.local.0eyw12f5fcis4NqwquHlxi1ySKjrQY78gSAI3Bd7KgN-6LSh9I6xkW9HTZbjRjHHqheHKvMgBdLwT4r47uK0L6wEBQy9VoLw97noycbifmEwoZxj_bLW6gxp53cdTRWfH-FnLtPIvO7yrxK1JG4hUlirHQ-mHHsDsYKhRzn6e2i9VMVR8GFR9os5M1_CxjSejo-BHlS_DQw_z-apkNqCaSk6uEvHJCjxrA1NIoNrFKyWtA0K4-z2etesc7z5UxwRJl9jTfRGnH8LlDOduINVmRK6oNbfxROwNeU.bnVsbA
+Content-Type: application/json
+
+{
+    "subject_id": 20, 
+    "num_question": 12, 
+    "time_exam": 3
+}

@@ -1,6 +1,7 @@
 package routers
 
 import (
+	"hieupc05.github/backend-server/internal/router/contest"
 	"hieupc05.github/backend-server/internal/router/manager"
 	"hieupc05.github/backend-server/internal/router/sse"
 	"hieupc05.github/backend-server/internal/router/upload"
@@ -12,6 +13,7 @@ type RouterGroup struct {
 	Manager manager.ManagerRouterGroup
 	Upload  upload.UploadRouterGroup
 	Sse     sse.SseRouterGroup
+	Contest contest.ContestRouteGroup
 }
 
 var RouterGroupApp = new(RouterGroup)

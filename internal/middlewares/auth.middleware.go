@@ -1,8 +1,6 @@
 package middlewares
 
 import (
-	"errors"
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -14,7 +12,7 @@ import (
 const (
 	authorizationHeaderKey  = "authorization"
 	authorizationTypeBearer = "bearer"
-	authorizationPayloadKey = "authorization_payload"
+	AuthorizationPayloadKey = "authorization_payload"
 )
 
 // AuthMiddleware creates a gin middleware for authorization
@@ -23,24 +21,21 @@ func AuthenMiddleware(tokenMaker token.Maker) gin.HandlerFunc {
 		authorizationHeader := ctx.GetHeader(authorizationHeaderKey)
 
 		if len(authorizationHeader) == 0 {
-			err := errors.New("authorization header is not provided")
-			rsp := response.ErrorResponse(response.ErrStatusUnauthorized, "", err.Error())
+			rsp := response.ErrorResponse(response.ErrUnauthorizedInvalidToken)
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, rsp)
 			return
 		}
 
 		fields := strings.Fields(authorizationHeader)
 		if len(fields) < 2 {
-			err := errors.New("invalid authorization header format")
-			rsp := response.ErrorResponse(response.ErrStatusUnauthorized, "", err.Error())
+			rsp := response.ErrorResponse(response.ErrUnauthorizedInvalidToken)
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, rsp)
 			return
 		}
 
 		authorizationType := strings.ToLower(fields[0])
 		if authorizationType != authorizationTypeBearer {
-			err := fmt.Errorf("unsupported authorization type %s", authorizationType)
-			rsp := response.ErrorResponse(response.ErrStatusUnauthorized, "", err.Error())
+			rsp := response.ErrorResponse(response.ErrUnauthorizedInvalidToken)
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, rsp)
 			return
 		}
@@ -48,12 +43,12 @@ func AuthenMiddleware(tokenMaker token.Maker) gin.HandlerFunc {
 		accessToken := fields[1]
 		payload, err := tokenMaker.VerifyToken(accessToken)
 		if err != nil {
-			rsp := response.ErrorResponse(response.ErrStatusUnauthorized, "", err.Error())
+			rsp := response.ErrorResponse(response.ErrUnauthorizedInvalidToken)
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, rsp)
 			return
 		}
 
-		ctx.Set(authorizationPayloadKey, payload)
+		ctx.Set(AuthorizationPayloadKey, payload)
 		ctx.Next()
 	}
 }

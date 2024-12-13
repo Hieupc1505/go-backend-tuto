@@ -16,20 +16,20 @@ var (
 // Payload contains the payload data of the token
 type Payload struct {
 	ID        uuid.UUID `json:"id"`
-	Username  string    `json:"username"`
+	UserID    int64     `json:"user_id"`
 	Role      string    `json:"role"`
 	IssuedAt  time.Time `json:"issued_at"`
 	ExpiredAt time.Time `json:"expired_at"`
 }
 
-func NewPayload(username string, role string, duration time.Duration) (*Payload, error) {
+func NewPayload(userId int64, role string, duration time.Duration) (*Payload, error) {
 	tokenID, err := uuid.NewRandom()
 	if err != nil {
 		return nil, err
 	}
 	payload := &Payload{
 		ID:        tokenID,
-		Username:  username,
+		UserID:    userId,
 		Role:      role,
 		IssuedAt:  time.Now(),
 		ExpiredAt: time.Now().Add(duration),
@@ -56,5 +56,5 @@ func (m *Payload) GetNotBefore() (*jwt.NumericDate, error) {
 	return &jwt.NumericDate{Time: m.IssuedAt}, nil
 }
 func (m *Payload) GetSubject() (string, error) {
-	return m.Username, nil
+	return m.ID.String(), nil
 }
