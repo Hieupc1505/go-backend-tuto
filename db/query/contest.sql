@@ -56,3 +56,33 @@ FROM
     sf_contest
 WHERE 
     state = $1;
+
+-- name: GetUserContestByID :one
+SELECT id, state, user_id
+FROM sf_contest
+WHERE id = $1
+AND user_id = $2;
+
+-- name: GetUserContestByState :many
+SELECT
+    id,
+    state,
+    time_exam,
+    num_question
+FROM sf_contest
+WHERE user_id = $1
+AND state = $2;
+
+-- name: GetContestInTwoCase :one
+SELECT EXISTS(
+    SELECT 1
+    FROM sf_contest
+    WHERE user_id = $1
+    AND (state = $2 OR state = $3)
+);
+
+-- name: UpdateContestState :one
+UPDATE sf_contest
+set state = $2
+WHERE id = $1
+RETURNING *;

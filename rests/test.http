@@ -5,7 +5,7 @@ POST {{baseUrl}}/register
 Content-Type: application/json
 
 {
-    "email": "hoanghieuss3x1@gmail.com",
+    "email": "hoanghieuss3x10@gmail.com",
     "password": "test13435"
 }
 
@@ -14,7 +14,7 @@ POST {{baseUrl}}/verify_otp
 Content-Length: application/json
 
 {
-    "email": "hoanghieuss3x1@gmail.com", 
+    "email": "hoanghieuss3x10@gmail.com",
     "otp": 123456
 }
 
@@ -23,7 +23,7 @@ POST {{baseUrl}}/login
 Content-Length: application/json
 
 {
-    "email": "hoanghieuss3x1@gmail.com", 
+    "email": "hoanghieuss3x10@gmail.com",
     "password": "test13435"
 }
 ###
@@ -31,6 +31,6 @@ POST {{baseUrl}}/info
 Content-Length: application/json
 
 {
-    "email": "hoanghieuss3x1@gmail.com", 
+    "email": "hoanghieuss3x10@gmail.com",
     "password": "test13435"
 }

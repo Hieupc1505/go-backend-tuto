@@ -54,6 +54,7 @@ const (
 	ErrContestLiveSubmitAlready     = 23000
 	ErrProfileCheckinCompleted      = 24000
 	ErrWalletBalanceNotEnough       = 25000
+	ErrContestAlreadyExists         = 50019
 )
 
 const (
@@ -96,6 +97,7 @@ var ErrorMessages = map[int]ErrorDetail{
 	ErrInvalidContestTimeExam:       {ErrInvalidCode, "invalid_data.contest.time_exam"},
 	ErrInvalidContestNumberQuestion: {ErrInvalidCode, "invalid_data.contest.number_question"},
 	ErrInvalidContestSubjectName:    {ErrInvalidCode, "invalid_data.contest.subject_name"},
+	ErrContestAlreadyExists:         {ErrInvalidCode, "contest.live.already"},
 	ErrInvalidNotEnoughAmount:       {ErrInvalidCode, "invalid_data.not_enough_amount"},
 	ErrInvalidContestNotFound:       {ErrInvalidCode, "invalid_data.contest.notfound"},
 	ErrInvalidAmount:                {ErrInvalidCode, "invalid_data.amount"},
@@ -110,5 +112,6 @@ var ErrorMessages = map[int]ErrorDetail{
 	ErrInvalidContestGameID:         {ErrInvalidCode, "invalid_data.contest.game_id"},
 	ErrContestLiveSubmitAlready:     {ErrContestStateCode, "contest.live.submit_already"},
 	ErrWalletBalanceNotEnough:       {ErrWalletCode, "wallet.balance.not_enough"},
+	ErrContestRunning:               {ErrContestStateCode, "contest.running"},
 	ErrContestCreated:               {0, ""},
 }

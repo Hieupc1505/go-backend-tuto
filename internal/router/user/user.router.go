@@ -25,6 +25,11 @@ func (pr *UserRouter) InitUserRouter(Router *gin.RouterGroup) {
 	}
 	UserRouterPublic := Router.Group("/user")
 	{
+		UserRouterPublic.GET("/ping", func(c *gin.Context) {
+			c.JSON(200, gin.H{
+				"message": "pong",
+			})
+		})
 		UserRouterPublic.POST("/register", userHanlerNonDependency.Register)
 		UserRouterPublic.POST("/verify_otp", userHanlerNonDependency.CreateUser)
 		UserRouterPublic.POST("/login", userHanlerNonDependency.Login)

@@ -131,6 +131,101 @@ func (q *Queries) GetContestByState(ctx context.Context, state ContestState) ([]
 	return items, nil
 }
 
+const getContestInTwoCase = `-- name: GetContestInTwoCase :one
+SELECT EXISTS(
+    SELECT 1
+    FROM sf_contest
+    WHERE user_id = $1
+    AND (state = $2 OR state = $3)
+)
+`
+
+type GetContestInTwoCaseParams struct {
+	UserID  int64        `json:"user_id"`
+	State   ContestState `json:"state"`
+	State_2 ContestState `json:"state_2"`
+}
+
+func (q *Queries) GetContestInTwoCase(ctx context.Context, arg GetContestInTwoCaseParams) (bool, error) {
+	row := q.db.QueryRow(ctx, getContestInTwoCase, arg.UserID, arg.State, arg.State_2)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
+const getUserContestByID = `-- name: GetUserContestByID :one
+SELECT id, state, user_id
+FROM sf_contest
+WHERE id = $1
+AND user_id = $2
+`
+
+type GetUserContestByIDParams struct {
+	ID     int64 `json:"id"`
+	UserID int64 `json:"user_id"`
+}
+
+type GetUserContestByIDRow struct {
+	ID     int64        `json:"id"`
+	State  ContestState `json:"state"`
+	UserID int64        `json:"user_id"`
+}
+
+func (q *Queries) GetUserContestByID(ctx context.Context, arg GetUserContestByIDParams) (GetUserContestByIDRow, error) {
+	row := q.db.QueryRow(ctx, getUserContestByID, arg.ID, arg.UserID)
+	var i GetUserContestByIDRow
+	err := row.Scan(&i.ID, &i.State, &i.UserID)
+	return i, err
+}
+
+const getUserContestByState = `-- name: GetUserContestByState :many
+SELECT
+    id,
+    state,
+    time_exam,
+    num_question
+FROM sf_contest
+WHERE user_id = $1
+AND state = $2
+`
+
+type GetUserContestByStateParams struct {
+	UserID int64        `json:"user_id"`
+	State  ContestState `json:"state"`
+}
+
+type GetUserContestByStateRow struct {
+	ID          int64        `json:"id"`
+	State       ContestState `json:"state"`
+	TimeExam    int32        `json:"time_exam"`
+	NumQuestion int32        `json:"num_question"`
+}
+
+func (q *Queries) GetUserContestByState(ctx context.Context, arg GetUserContestByStateParams) ([]GetUserContestByStateRow, error) {
+	rows, err := q.db.Query(ctx, getUserContestByState, arg.UserID, arg.State)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []GetUserContestByStateRow{}
+	for rows.Next() {
+		var i GetUserContestByStateRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.State,
+			&i.TimeExam,
+			&i.NumQuestion,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const updateContest = `-- name: UpdateContest :one
 UPDATE sf_contest
 SET 
@@ -191,6 +286,36 @@ func (q *Queries) UpdateContest(ctx context.Context, arg UpdateContestParams) (U
 		&i.TimeStartExam,
 		&i.State,
 		&i.Questions,
+	)
+	return i, err
+}
+
+const updateContestState = `-- name: UpdateContestState :one
+UPDATE sf_contest
+set state = $2
+WHERE id = $1
+RETURNING id, user_id, subject_id, num_question, time_exam, time_start_exam, state, questions, created_time, updated_time
+`
+
+type UpdateContestStateParams struct {
+	ID    int64        `json:"id"`
+	State ContestState `json:"state"`
+}
+
+func (q *Queries) UpdateContestState(ctx context.Context, arg UpdateContestStateParams) (SfContest, error) {
+	row := q.db.QueryRow(ctx, updateContestState, arg.ID, arg.State)
+	var i SfContest
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.SubjectID,
+		&i.NumQuestion,
+		&i.TimeExam,
+		&i.TimeStartExam,
+		&i.State,
+		&i.Questions,
+		&i.CreatedTime,
+		&i.UpdatedTime,
 	)
 	return i, err
 }

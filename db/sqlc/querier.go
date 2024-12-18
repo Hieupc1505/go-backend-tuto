@@ -17,9 +17,13 @@ type Querier interface {
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	GetContest(ctx context.Context, id int64) (GetContestRow, error)
 	GetContestByState(ctx context.Context, state ContestState) ([]GetContestByStateRow, error)
+	GetContestInTwoCase(ctx context.Context, arg GetContestInTwoCaseParams) (bool, error)
 	GetSession(ctx context.Context, id uuid.UUID) (Session, error)
 	GetUserByEmail(ctx context.Context, email string) (User, error)
+	GetUserContestByID(ctx context.Context, arg GetUserContestByIDParams) (GetUserContestByIDRow, error)
+	GetUserContestByState(ctx context.Context, arg GetUserContestByStateParams) ([]GetUserContestByStateRow, error)
 	UpdateContest(ctx context.Context, arg UpdateContestParams) (UpdateContestRow, error)
+	UpdateContestState(ctx context.Context, arg UpdateContestStateParams) (SfContest, error)
 }
 
 var _ Querier = (*Queries)(nil)

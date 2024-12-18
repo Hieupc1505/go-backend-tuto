@@ -26,7 +26,7 @@ redis:
   password: U9vO5nr7tG3ECgoAy871PXL5I53oD9tE
 token: 
   secret_key: "01234567890123456789012345678912"
-  access_token_duration: 30m
+  access_token_duration: 1h
   refresh_token_duration: 24h
 imgur: 
   client_id: c73e3a75440ef9f

@@ -43,6 +43,7 @@ func (contest *ContestController) LiveContest(ctx *gin.Context) {
 	})
 }
 func (contest *ContestController) PlayContest(ctx *gin.Context) {
+	contest.contestService.PlayContest()
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": "Play Contest Success",
 	})
