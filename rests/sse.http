@@ -1,3 +1,12 @@
-@baseUrl=http://localhost:8002/v1/2024/sse
+@baseUrl=http://localhost:8002/v1/2024
+@token=v2.local.fvWM6_aHUjufdVUHVC9qMmtERRH7WJzDoGyhqtPrv0OPueAjBTvR6SYedKohAj3u-CspA3U1p_Ov4sRl-p5f4_xSRK_L-y6jTge5ZL3PWiRzZyNAKke3jx0ZbJA576GU3QhB1inJfhWRbbWyuhZ48NDMdGQ-6WawzaLmanBNSZHX14ZM4v80Suz1xeRBXtkhd6Hcyxoc1t9AZWz3UxOn50zjF48vgHAfcXbTVPFlQ0EuJo2yhhV8_vr5pnhimZ9uudlCu87SNjSZEYBPDq4gEOCzbLtOepHrT1o.bnVsbA
 ###
-GET {{baseUrl}}/contest/start
+GET {{baseUrl}}/contest/start/22
+
+###
+POST {{baseUrl}}/contest/play/22
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+###
+POST

@@ -1,8 +1,21 @@
 @baseURL=http://localhost:8002/v1/2024/contest
+@accessToken=v2.local.YcLk3ZZT7KUOUCwFTwFRoUUbz7NVJFRrY_fCq_H2yPhCUjHNtrLtG0GCxy8sq1PzQLAvlKqBDgXXAbuEwf9HPk_K1cJyGtvwJX9hH4fOCBJ09bCSvQG8bebd90EovgTawn491UJFpaGWU0w1Jnzftlkj0lhjANAEfnK_10fKa-bL8n0zVKerACUrZkq9QidQug1d1iJkwlH5JF-idpO8jJ_M9xPB0xAlaKL2aajTt8vwXPgozoE79YeJy2lMqniBBhxdRCavsmySiX0XQnXs27uqTwbW-bM47_s.bnVsbA
+
+###
+GET {{baseURL}}/start/22
+Authorization: Bearer {{accessToken}}
+
+###
+POST {{baseURL}}/play/22
+Authorization: Bearer {{accessToken}}
+
+###
+GET {{baseURL}}/stop/22
+Authorization: Bearer {{accessToken}}
 
 ###
 POST {{baseURL}}/create
-Authorization: Bearer v2.local.xJgAKiohSuCUKhDFz2TBOGLE3vbay_SLHUVv3lzVc3OUGQ6f2eGacDAHVrurACrlwlfikLw7fe29tLEnBstrqU184bnytt2MhN75dhjUxoncbLqzSwrIH4Cved1ZACEArqDWLllfepSCde6GLPHYdCm1rvz09Hn8MMD1VQHDMitGCJs1wxrJys0uTbx9Jd-cCEFzJrH-QMNDV7zVcJpQ77StTsDUooeMGUt7RpZYGSnSYrgweJNV0ds3syMESWw9aPgasLSStmvRLZlvTBEkYq6h9E15RojaSSM.bnVsbA
+Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 {

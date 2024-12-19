@@ -23,7 +23,7 @@ POST {{baseUrl}}/login
 Content-Length: application/json
 
 {
-    "email": "hoanghieuss3x10@gmail.com",
+    "email": "hoanghieuss3x1@gmail.com",
     "password": "test13435"
 }
 ###

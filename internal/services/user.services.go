@@ -162,7 +162,8 @@ func (us *userServices) Login(ctx *gin.Context, email string, purpose string) (_
 
 	user, err := us.userRepo.GetUserByEmail(email)
 	if err != nil {
-		if err == db.ErrRecordNotFound {
+		fmt.Println(err)
+		if errors.Is(err, db.ErrRecordNotFound) {
 			return response.ErrorResponse(response.ErrUserNotFound), http.StatusBadRequest
 		}
 		return response.ErrorResponse(response.ErrSystem), http.StatusInternalServerError

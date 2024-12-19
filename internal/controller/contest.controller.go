@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"hieupc05.github/backend-server/internal/services"
@@ -17,6 +18,10 @@ type CreateContestRequest struct {
 	SubjectID   int64  `json:"subject_id" binding:"required"`
 	SubjectName string `json:"subject_name"`
 	TimeExam    int32  `json:"time_exam" binding:"required"`
+}
+
+type StartContestRequest struct {
+	RId int64 `json:"r_id" binding:"required"`
 }
 
 func NewContestController(sv services.IContestService) *ContestController {
@@ -38,25 +43,48 @@ func (contest *ContestController) CreateContest(ctx *gin.Context) {
 
 }
 func (contest *ContestController) LiveContest(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": "Live Contest Success",
-	})
+	rid := ctx.Param("id")
+	parse, err := strconv.ParseInt(rid, 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, response.ErrorResponse(response.ErrSystem))
+		return
+	}
+	contest.contestService.LiveContest(ctx, parse)
 }
 func (contest *ContestController) PlayContest(ctx *gin.Context) {
-	contest.contestService.PlayContest()
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": "Play Contest Success",
-	})
+	rid := ctx.Param("id")
+	parse, err := strconv.ParseInt(rid, 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, response.ErrorResponse(response.ErrSystem))
+		return
+	}
+	contest.contestService.PlayContest(ctx, parse)
 }
 
 func (contest *ContestController) EndContest(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": "End Contest Success",
-	})
+	rid := ctx.Param("id")
+	parse, err := strconv.ParseInt(rid, 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, response.ErrorResponse(response.ErrSystem))
+		return
+	}
+	contest.contestService.EndContest(ctx, parse)
 }
 
 func (contest *ContestController) SubmitAnswer(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": "Submit Contest Success",
 	})
+}
+
+func (contest *ContestController) GetContestLiveById(ctx *gin.Context) {
+
+}
+
+func (contest *ContestController) GetListLiveContest(ctx *gin.Context) {
+
+}
+
+func (contest *ContestController) GetMyContestLive(ctx *gin.Context) {
+
 }
