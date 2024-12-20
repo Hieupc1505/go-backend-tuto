@@ -10,7 +10,6 @@ import (
 type State struct {
 	Members map[int64]chan sse.SseStatus // Map of user ID to their message channel
 	State   chan bool                    // A channel to hold any state information
-	Close   chan bool                    // A channel to handle remove room
 }
 
 type Manager struct {
@@ -38,7 +37,6 @@ func (m *Manager) MakeRoom(roomID int64) {
 		m.Rooms[roomID] = &State{
 			Members: make(map[int64]chan sse.SseStatus), // Initialize members
 			State:   make(chan bool),                    // Initialize state channel
-			Close:   make(chan bool),                    // Initialize close channel
 		}
 	}
 
@@ -98,9 +96,7 @@ func (m *Manager) RemoveRoom(roomID int64) {
 
 	// Check if the room exists
 	if state, exists := m.Rooms[roomID]; exists {
-		// Broadcast a message to all users before removing the room
-		m.BroadcastToRoom(roomID, "End contest")
-
+		fmt.Printf("Removing room %d with %d members\n", roomID, len(state.Members))
 		// Close the state channel and delete the room
 		close(state.State)
 		delete(m.Rooms, roomID)
@@ -108,25 +104,33 @@ func (m *Manager) RemoveRoom(roomID int64) {
 }
 
 // BroadcastToRoom sends a message to all members of a specific room
-func (m *Manager) BroadcastToRoom(roomID int64, message sse.SseStatus) {
+func (m *Manager) BroadcastToRoom(roomID int64, messages ...sse.SseStatus) error {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
 
-	// Check if the room exists
-	if state, exists := m.Rooms[roomID]; exists {
-		fmt.Printf("Broadcasting to room %d with %d members\n", roomID, len(state.Members))
+	// Check if room exists
+	state, exists := m.Rooms[roomID]
+	if !exists {
+		return fmt.Errorf("room %d does not exist", roomID)
+	}
+
+	fmt.Printf("Broadcasting to room %d with %d members\n", roomID, len(state.Members))
+
+	// Iterate through each message in the variadic parameter
+	for _, message := range messages {
 		// Send the message to all members
 		for userID, ch := range state.Members {
 			select {
 			case ch <- message:
 				// Message sent successfully
-				fmt.Printf("Sent message to user %d in room %d\n", userID, roomID)
+				fmt.Printf("Sent message to user %d in room %d: %v\n", userID, roomID, message)
 			default:
-				// If a user's channel is full, skip them to avoid deadlock
+				// If a user's channel is full, skip them
 				fmt.Printf("Channel for user %d in room %d is full, skipping\n", userID, roomID)
 			}
 		}
 	}
+	return nil
 }
 
 // IsRoomNotExist checks if a room does not exist

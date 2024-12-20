@@ -166,7 +166,11 @@ func (c *ContestService) PlayContest(ctx *gin.Context, rid int64) {
 		ctx.JSON(http.StatusInternalServerError, rsp)
 		return
 	}
-	global.RoomManage.BroadcastToRoom(result.ID, "Start Contest")
+	err = global.RoomManage.BroadcastToRoom(result.ID, sse.StartContest)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, response.ErrorResponse(response.ErrInvalidContestGameID))
+		return
+	}
 
 	ctx.JSON(http.StatusOK, gin.H{"id": result.ID})
 }
@@ -205,10 +209,15 @@ func (c *ContestService) EndContest(ctx *gin.Context, rid int64) {
 	}
 
 	// Broadcast to all clients
-	global.RoomManage.BroadcastToRoom(rid, sse.EndContest)
+	err = global.RoomManage.BroadcastToRoom(rid, sse.EndContest)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, response.ErrorResponse(response.ErrInvalidContestGameID))
+		return
+	}
+
+	//Truyền tín hiệu rằng phòng đã đóng
 	global.RoomManage.Rooms[rid].State <- true
 
-	//global.RoomManage.RemoveRoom(rid)
 	ctx.JSON(http.StatusOK, gin.H{"id": rid})
 }
 

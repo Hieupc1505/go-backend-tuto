@@ -1,6 +1,6 @@
 @baseUrl=http://localhost:8002/v1/2024/user
 
-###
+### Register
 POST {{baseUrl}}/register
 Content-Type: application/json
 
@@ -9,7 +9,7 @@ Content-Type: application/json
     "password": "test13435"
 }
 
-###
+### Verify OTP
 POST {{baseUrl}}/verify_otp
 Content-Length: application/json
 
@@ -18,15 +18,15 @@ Content-Length: application/json
     "otp": 123456
 }
 
-###
+### Login
 POST {{baseUrl}}/login
 Content-Length: application/json
 
 {
-    "email": "hoanghieuss3x1@gmail.com",
+    "email": "hoanghieuss3x10@gmail.com",
     "password": "test13435"
 }
-###
+### GetInfo
 POST {{baseUrl}}/info
 Content-Length: application/json
 
